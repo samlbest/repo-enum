@@ -2,16 +2,15 @@
 # repo_enum.py
 # Author: Sam Best
 
-import time
-import sys
-
 import os
+import shutil
+import contextlib
+import tempfile
 import argparse
-import tarfile
+import zipfile
 import urllib2
+import urllib
 import json
-
-REPO_TEMPDIR = "repocontents"
 
 class RepoEnum:
     def __init__(self):
@@ -59,7 +58,11 @@ class RepoEnum:
 
         #Build URL corresponding to urlType arg:
         if urlType == 'repolanguages':
-            return os.path.join("https://api.github.com/repos/", username, reponame, "languages")
+            return os.path.join("https://api.github.com/repos", username, reponame, "languages")
+
+        elif urlType == 'repozip':
+            #Retrieve zip location for master branch
+            return os.path.join("https://github.com", username, reponame, "zipball", "master")
 
         else:
             raise Exception("Invalid URL type.\nValid options: repolanguages")
@@ -79,8 +82,30 @@ class RepoEnum:
             if lang not in self._repos[repo].keys():
                 self._repos[repo][lang] = 0
 
-    def _retrieveRepo(self, repo):
+    def _retrieveRepo(self, repo, repodir):
         """Retrieves files from repository, stores in temp directory"""
+        url = self._buildUrl(repo, 'repozip')
+
+        #Download file from github:
+        zipFile, headers = urllib.urlretrieve(url, os.path.join(repodir, "temp.zip"))
+        return zipFile
+
+    @contextlib.contextmanager
+    def _tempdir(self):
+        """Creates a temp directory which will be deleted automatically"""
+        tmpdir = tempfile.mkdtemp()
+        try:
+            yield tmpdir
+        finally:
+            shutil.rmtree(tmpdir)
+
+    def _extractZip(self, repozip, extractTo):
+        """Extracts zipfile 'repozip' to directory 'extractTo'"""
+        if zipfile.is_zipfile(repozip):
+            z = zipfile.ZipFile(repozip)
+            z.extractall(extractTo)
+            return z.namelist()
+        return None
 
     def countRepos(self):
         for r in self._args.repo:
@@ -90,6 +115,27 @@ class RepoEnum:
             except Exception as e:
                 print "Error processing repo ["+ r +"]\nServer response: ",e
                 continue
+
+            with self._tempdir() as tempdir:
+                #Retrieve zip file:
+                print "Downloading repository:", r + "..."
+                try:
+                    repozip = self._retrieveRepo(r, tempdir)
+                except Exception as e:
+                    print "Error retrieving zip file\nServer response: ",e
+                    continue
+
+                #Extract zip file:
+                try:
+                    repoFiles = self._extractZip(repozip, tempdir)
+                except Exception as e:
+                    print "Error extracting zip file\nMessage: ",e
+                    continue
+
+                #Process repo files -- generate list of all regular files:
+                fileList = [os.path.join(tempdir, f) for f in repoFiles if not os.path.isdir(os.path.join(tempdir, f))]
+                print fileList
+
 
 if __name__ == '__main__':
     test = RepoEnum()
