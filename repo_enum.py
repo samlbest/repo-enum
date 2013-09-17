@@ -7,7 +7,6 @@ import tempfile
 import argparse
 import zipfile
 import urllib2
-import urllib
 import json
 
 import yaml
@@ -31,10 +30,15 @@ class RepoEnum:
     def _getRepoLang(self, repo):
         """Returns the languages contained in the repo as a list"""
 
-        #Fetch JSON Object containing languages used in repo from Github
         url = self._buildUrl(repo, 'repolanguages')
-        gitJson = urllib2.urlopen(url)
-        result = json.load(gitJson)
+        #Fetch JSON Object containing languages used in repo from Github
+
+        userAgent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
+        headers = {'User-Agent':userAgent,}
+        request = urllib2.Request(url, None, headers)
+        response = urllib2.urlopen(request)
+
+        result = json.load(response)
 
         #If "message" present in Github's response, error occurred:
         if "message" in result:
@@ -89,8 +93,17 @@ class RepoEnum:
         url = self._buildUrl(repo, 'repozip')
 
         #Download file from github:
-        zipFile, headers = urllib.urlretrieve(url, os.path.join(repodir, "temp.zip"))
-        return zipFile
+        userAgent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
+        headers = {'User-Agent':userAgent,}
+        request = urllib2.Request(url, None, headers)
+        response = urllib2.urlopen(request)
+
+        data = response.read()
+        with open(os.path.join(repodir, "temp.zip"), "wb") as output:
+            output.write(data)
+
+        #zipFile, headers = urllib.urlretrieve(url, os.path.join(repodir, "temp.zip"))
+        return os.path.join(repodir, "temp.zip")
 
     @contextlib.contextmanager
     def _tempdir(self):
