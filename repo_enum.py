@@ -53,7 +53,7 @@ class RepoEnum:
 
         Valid options for urlType:
             repolanguages
-
+            repozip
         """
 
         #Parse username and repo name from argument:
@@ -69,7 +69,7 @@ class RepoEnum:
             return os.path.join("https://github.com", username, reponame, "zipball", "master")
 
         else:
-            raise Exception("Invalid URL type.\nValid options: repolanguages")
+            raise Exception("Invalid URL type.\nValid options: repolanguages, repozip")
 
     def _updateLangDict(self, repo):
         """Calls self._getRepoLang to query Github API, updates self._repos with results"""
@@ -194,5 +194,5 @@ class RepoEnum:
         self._displayReport()
 
 if __name__ == '__main__':
-    test = RepoEnum()
-    test.countRepos()
+    repoenum = RepoEnum()
+    repoenum.countRepos()
