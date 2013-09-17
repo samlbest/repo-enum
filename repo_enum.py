@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# repo_enum.py
-# Author: Sam Best
+"""Downloads a Github repository and generates a report about the lines of code for each language."""
 
 import os
 import shutil
@@ -122,7 +120,12 @@ class RepoEnum:
 
     def _displayReport(self):
         """Displays a formatted report of line counts of all programming languages found in repos"""
-        pass
+        for ko, vo in self._repos.iteritems():
+            total = self._repos[ko]['total']
+            print "Repository: ", ko
+            for k, v in vo.iteritems():
+                print "*%s: %d %.2f%%" % (k, v,  100.0*v/total)
+            print "-"*50
 
     def countRepos(self):
         """Counts files and generates a report for each programming language"""
@@ -175,7 +178,7 @@ class RepoEnum:
                             self._repos[r]['total'] += count
                             self._repos[r][l] += count
 
-                print self._repos
+        self._displayReport()
 
 if __name__ == '__main__':
     test = RepoEnum()
