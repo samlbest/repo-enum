@@ -9,18 +9,18 @@ Distribution of code lines by programming language is displayed, along with the 
 
 1. Install PyYAML if not already installed:
 
-* Download version suitable for your OS at http://pyyaml.org/wiki/PyYAML
-* Install:
+  * Download version suitable for your OS at http://pyyaml.org/wiki/PyYAML
+  * Install:
 
-  **Linux:**
-  * Navigate to location of PyYAML-x.yy.tar.gz
-  * Extract archive: ```tar xvf PyYAML-x.yy.tar.gz```
-  * Navigate to newly created folder.
-  * Run setup:
-      sudo python setup.py install
+    **Linux:**
+      * Navigate to location of PyYAML-x.yy.tar.gz
+      * Extract archive: ```tar xvf PyYAML-x.yy.tar.gz```
+      * Navigate to newly created folder.
+      * Run setup:
+        sudo python setup.py install
 
-  **Windows:**
-  * Run PyYAML installer.
+    **Windows:**
+      * Run PyYAML installer.
 
 2. Clone repo:
 
@@ -29,7 +29,7 @@ Distribution of code lines by programming language is displayed, along with the 
 3. Navigate to new repo-enum directory.
 
 ## Usage
-    python repo_enum.py -r samlbest/repo-enum -r user/repo
+    python repo_enum.py -r samlbest/repo-enum -r [github-user]/[reponame] -r [...]
 
 ### Options
 * ```-r```: Add a repository to be enumerated.
