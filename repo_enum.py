@@ -12,6 +12,8 @@ import urllib2
 import urllib
 import json
 
+import yaml
+
 class RepoEnum:
     def __init__(self):
         self._parser = argparse.ArgumentParser(description='Counts the number of lines of code in a Github repository.')
@@ -82,6 +84,8 @@ class RepoEnum:
             if lang not in self._repos[repo].keys():
                 self._repos[repo][lang] = 0
 
+        return response
+
     def _retrieveRepo(self, repo, repodir):
         """Retrieves files from repository, stores in temp directory"""
         url = self._buildUrl(repo, 'repozip')
@@ -107,11 +111,24 @@ class RepoEnum:
             return z.namelist()
         return None
 
+    def _countFileLines(self, filepath):
+        f = open(filepath, 'r')
+
+        #Creates enumeration from lines in file
+        for i, l in enumerate(f):
+            pass
+
+        return i+1
+
+    def _displayReport(self):
+        """Displays a formatted report of line counts of all programming languages found in repos"""
+        pass
+
     def countRepos(self):
+        """Counts files and generates a report for each programming language"""
         for r in self._args.repo:
-            #self._repos[r] = collections.defaultdict
             try:
-                self._updateLangDict(r)
+                langs = self._updateLangDict(r)
             except Exception as e:
                 print "Error processing repo ["+ r +"]\nServer response: ",e
                 continue
@@ -132,12 +149,34 @@ class RepoEnum:
                     print "Error extracting zip file\nMessage: ",e
                     continue
 
-                #Process repo files -- generate list of all regular files:
-                fileList = [os.path.join(tempdir, f) for f in repoFiles if not os.path.isdir(os.path.join(tempdir, f))]
-                print fileList
+                self._repos[r]['total'] = 0 #Track total number of lines
 
+                #Create list of files (excluding directories):
+                fileList = [os.path.join(tempdir, f) for f in repoFiles if not os.path.isdir(os.path.join(tempdir, f))]
+
+                #TODO: create option to count all files, selective extensions, etc
+                if True:
+                    #Load GitHub languages yaml:
+                    langRef = yaml.load(open("languages.yml", 'r'))
+
+                    for f in fileList:
+                        ext = os.path.splitext(f)[1]
+
+                        #Check if extension is valid for each language contained in repo:
+                        for l in langs:
+                            if ext == "":
+                                continue
+                            elif ext not in langRef[l]['primary_extension']:
+                                if 'extensions' not in langRef[l].keys() or ext not in langRef[l]['extensions']:
+                                    continue
+
+                            #Add file line count to self._repos
+                            count = self._countFileLines(f)
+                            self._repos[r]['total'] += count
+                            self._repos[r][l] += count
+
+                print self._repos
 
 if __name__ == '__main__':
     test = RepoEnum()
     test.countRepos()
-
