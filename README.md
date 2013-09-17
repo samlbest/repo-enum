@@ -14,8 +14,7 @@ Distribution of code lines by programming language is displayed, along with the 
 
   **Linux:**
   * Navigate to location of PyYAML-x.yy.tar.gz
-  * Extract archive:
-      tar xvf PyYAML-x.yy.tar.gz
+  * Extract archive: ```tar xvf PyYAML-x.yy.tar.gz```
   * Navigate to newly created folder.
   * Run setup:
       sudo python setup.py install
@@ -27,8 +26,10 @@ Distribution of code lines by programming language is displayed, along with the 
 
 ```git clone https://github.com/samlbest/repo-enum.git```
 
+3. Navigate to new repo-enum directory.
+
 ## Usage
     python repo_enum.py -r samlbest/repo-enum -r user/repo
 
 ### Options
-    ```-r```: Add a repository to be enumerated.
+* ```-r```: Add a repository to be enumerated.
