@@ -31,8 +31,8 @@ class RepoEnum:
         """Returns the languages contained in the repo as a list"""
 
         url = self._buildUrl(repo, 'repolanguages')
-        #Fetch JSON Object containing languages used in repo from Github
 
+        #Fetch JSON Object containing languages used in repo from Github
         userAgent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
         headers = {'User-Agent':userAgent,}
         request = urllib2.Request(url, None, headers)
@@ -62,11 +62,11 @@ class RepoEnum:
 
         #Build URL corresponding to urlType arg:
         if urlType == 'repolanguages':
-            return os.path.join("https://api.github.com/repos", username, reponame, "languages")
+            return os.path.join("https://api.github.com/repos", username, reponame, "languages").replace("\\", "/")
 
         elif urlType == 'repozip':
             #Retrieve zip location for master branch
-            return os.path.join("https://github.com", username, reponame, "zipball", "master")
+            return os.path.join("https://github.com", username, reponame, "zipball", "master").replace("\\", "/")
 
         else:
             raise Exception("Invalid URL type.\nValid options: repolanguages, repozip")
